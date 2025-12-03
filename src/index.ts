@@ -1,7 +1,7 @@
 import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
-const bodyParser = require("body-parser");
+//const bodyParser = require("body-parser");
 
 
 const __filename = fileURLToPath(import.meta.url)
@@ -54,7 +54,7 @@ app.get('/healthz', (req, res) => {
 
 
 
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
 
 // ---------- Okta Inline Hook Endpoint ----------
 app.post("/okta/registration-hook", (req, res) => {
