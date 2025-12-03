@@ -57,51 +57,31 @@ app.get('/healthz', (req, res) => {
 //app.use(bodyParser.json());
 
 // ---------- Okta Inline Hook Endpoint ----------
-app.post("/okta/registration-hook", (req, res) => {
+// Okta Inline Hook endpoint (MUST be under /api for Vercel)
+app.post("/api/okta/registration-hook", (req, res) => {
   const body = req.body;
   const request = body?.context?.request || {};
 
   const email = body?.data?.userProfile?.email || "";
   const userAgent = request.userAgent || "";
-  const referer = request.referer || "";
-  const ip = request.ipAddress || "";
 
-  // Block bots/scripts by User-Agent
   const botPatterns = [
-    /curl/i,
-    /wget/i,
-    /python/i,
-    /php/i,
-    /java/i,
-    /go-http/i,
-    /httpclient/i,
-    /powershell/i,
-    /node-fetch/i,
-    /postman/i
+    /curl/i, /wget/i, /python/i, /php/i, /postman/i
   ];
 
   if (botPatterns.some(p => p.test(userAgent))) {
     return deny("Automated registrations are blocked");
   }
 
-  // Block disposable emails
-  const disposableDomains = [
-    "mailinator.com",
-    "yopmail.com",
-    "10minutemail.com",
-    "tempmail.com"
-  ];
-
+  const disposableDomains = ["mailinator.com", "yopmail.com"];
   const domain = email.split("@")[1]?.toLowerCase();
 
   if (disposableDomains.includes(domain)) {
-    return deny("Disposable email domains are not allowed");
+    return deny("Disposable email domains not allowed");
   }
 
-  // Allow registration
   return res.json({ commands: [] });
 
-  // Helper
   function deny(msg) {
     return res.json({
       commands: [
